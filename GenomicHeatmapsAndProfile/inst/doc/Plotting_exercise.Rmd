@@ -1,0 +1,40 @@
+---
+title: "Exercise Set - Base Plotting"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/Plotting_In_R/"
+output: 
+  html_document:
+    number_sections: false  ## if you want number sections at each table header
+    theme: united  # many options for theme, this one is my favorite.
+    highlight: tango  # specifies the syntax highlighting style
+---
+
+<p>&nbsp;</p>
+These exercises cover base plotting for [Plotting in R](https://rockefelleruniversity.github.io/Plotting_In_R/). 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,eval=T)
+```
+
+
+## Exercise 1
+Read in the data "timecourse.csv" as a data.frame and get a summary of column values
+
+
+## Exercise 2
+Produce a histogram of the values for control and treatment samples
+
+
+## Exercise 3
+Put these in the same plot with same X scale limits
+atrix(timeCourse)[,4:5],xlim = c(0,20),main = "Treatment",xlab = "Treatment")
+
+
+## Exercise 4
+Make a barplot of values in control sample 1 for every time point
+
+## Exercise 5
+Make a barplot of mean values in control and treatment samples side by side for every time point
+
+## Exercise 6
+Create a line graph showing control and treatment samples against time.

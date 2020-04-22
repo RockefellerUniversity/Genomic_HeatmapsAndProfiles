@@ -1,0 +1,7 @@
+Day,Treatment,Control
+Mon,0.02,0
+Tue,1.8,20
+Wed,17.5,40
+Thu,55,60
+Fri,75.7,80
+Sat,80,100
