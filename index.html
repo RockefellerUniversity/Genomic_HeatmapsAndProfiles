@@ -66,9 +66,10 @@ To install these,</p>
 <li>First launch RStudio</li>
 <li>Install the packages in the R console using install.packages 
 <pre>
-install.packages("profileplyr",dependencies=TRUE)
-install.packages("GEOquery",dependencies=TRUE)
 install.packages("ggplot2",dependencies=TRUE)
+install.packages("BiocManager")
+BiocManager::install("profileplyr")
+BiocManager::install("GEOquery")
 </pre>
 </li>
 </ul>
