@@ -17,9 +17,6 @@ output:
     number_sections: false  ## if you want number sections at each table header
     theme: united  # many options for theme, this one is my favorite.
     highlight: tango  # specifies the syntax highlighting style
-
-
-
 ---
 
 
@@ -90,7 +87,8 @@ or in the console.
 
 ```{r setwd_introtoR,eval=F} 
 setwd("/PathToMyDownload/GenomicHeatmapsAndProfiles/r_course")
-# e.g. setwd("~/Downloads/Intro_To_R_1Day/r_course")
+## For Fuchs Lab
+# e.g. setwd("/Workshop_Data/TestFolder/")
 ```
 
 
@@ -409,7 +407,7 @@ GSM4332950_BigWig <- getGEOSuppFiles("GSM4332950",fetch_files = TRUE,
                                      filter_regex = "*.bw")
 ```
 
-```{r download_Data2,cache=TRUE,warning=FALSE,message=FALSE,echo=FALSE,eval=TESTORNOT}
+```{r download_Data2,cache=TRUE,warning=FALSE,message=FALSE,echo=FALSE,eval=FALSE}
 require(GEOquery)
 
 GSM4332935_BigWig <- getGEOSuppFiles("GSM4332935",fetch_files = FALSE,
@@ -900,8 +898,6 @@ We can use the GSEAbase package to read in the data from the GMT file and the ge
 require(GSEABase)
 aa_meta <- getGmt("GeneSets/aminoacid_metabolism.gmt")
 aa_meta_Genes <- geneIds(aa_meta)
-names(aa_meta_Genes) <- "Aminoacid_metabolism"
-aa_meta_Genes
 ```
 
 ---
@@ -928,6 +924,19 @@ Finally we can plot grouped by our gene-set of interest.
 generateEnrichedHeatmap(ztbtb1Andatf4_profile2,
                         color_by_sample_group = "Antibody",
                         genes_to_label = "ASNS",
+                        gene_label_font_size = 18)
+```
+
+---
+## Grouping by genes
+
+The overlap is quite small so we regroup by a different column and add the gene set as annotation instead by specify "GL_overlap_names" to the **extra_annotation_columns** parameter
+
+```{r annotated9,echo=TRUE,eval=TRUE,cache=TRUE,dependson="groupAndPlot",fig.width = 10,fig.height = 5,message=FALSE,warning=FALSE}
+ztbtb1Andatf4_profile2 <- groupBy(ztbtb1Andatf4_profile2,group="cluster")
+generateEnrichedHeatmap(ztbtb1Andatf4_profile2,
+                        color_by_sample_group = "Antibody",genes_to_label = "ASNS",
+                        extra_annotation_columns = "GL_overlap_names",
                         gene_label_font_size = 18)
 ```
 
