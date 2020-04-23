@@ -38,9 +38,9 @@ TESTORNOT <- FALSE
 ## Overview
 
 - Set up
-- Genomic Heatmaps
-- Making a simple heatmap
-- More complex heatmaps
+- Raw data to visualisations
+  - Raw data to visualisations in R (Quick)
+- Visualising signal over genomic region sets
 
 ---
 class: inverse, center, middle
@@ -54,11 +54,11 @@ class: inverse, center, middle
 
 All prerequisites, links to material and slides for this course can be found on github.
 
-* [GenomicHeatmapsAndProfiles](https://rockefelleruniversity.github.io/GenomicHeatmapsAndProfiles/)
+* [GenomicHeatmapsAndProfiles](https://rockefelleruniversity.github.io/Genomic_HeatmapsAndProfiles/)
 
 Or can be downloaded as a zip archive from here.
 
-* [Download zip](https://github.com/rockefelleruniversity/GenomicHeatmapsAndProfiles/zipball/master)
+* [Download zip](https://github.com/rockefelleruniversity/Genomic_HeatmapsAndProfiles/zipball/master)
 
 ---
 ## Presentations, source code and practicals
@@ -203,7 +203,7 @@ We can retrieve this from [Ensembl FTP](https://www.ensembl.org/info/data/ftp/in
 ---
 ## A reference genome in R.
 
-We can also extract genomes from Bioconductor objects inside of R. Here we use the **BSgenome.Hsapiens.UCSC.hg19** to [extract the sequence for major chromosomes and write out to a FASTA file](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/SequencesInBioconductor.html#4).
+We can also [extract genomes from Bioconductor objects](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/SequencesInBioconductor.html#3) inside of R. Here we use the **BSgenome.Hsapiens.UCSC.hg19** to [extract the sequence for major chromosomes and write out to a FASTA file](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/SequencesInBioconductor.html#4).
 
 ```{r GetFasta,cache=TRUE,warning=FALSE,message=FALSE,eval=FALSE}
 require(BSgenome.Hsapiens.UCSC.hg19)
@@ -280,10 +280,11 @@ coverageOverGenome <- coverage("Sorted_ENCFF001NQP.bam",
 export.bw(coverageOverGenome,con="Sorted_ENCFF001NQP.bw")
 ```
 
+We may also want to extend reads to *predicted* fragment length before generating coverage.[For more details on this see our material here](https://rockefelleruniversity.github.io/RU_ATACseq/atacseq_course/Presentations/Slides/RU_ATAC.html#37).
 ---
 class: inverse, center, middle
 
-# Visualising signal over multiple genomic regions
+# Visualising signal over genomic region sets.
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
 
@@ -299,7 +300,7 @@ We can easily review our signal data in IGV at a simgle locus to assess the rela
 ---
 ## Multipanel review in IGV
 
-In IGV we can also review multiple loci in one screen to get an overview of signal over a group of regions.
+In IGV [we can also review multiple loci](https://rockefelleruniversity.github.io/IGV_course/r_course/presentations/slides/IGV.html#24) in one screen to get an overview of signal over a group of regions.
 
 <div align="center">
 <img src="imgs/REACTOME_IGV2.png" alt="offset" height="400" width="800">
@@ -315,6 +316,9 @@ Often we want to review signal within and between samples/conditions over 1000s 
 Two major softwares to produce genomic heatmaps
 * Deeptools
 * EnrichedHeatmap
+<div align="center">
+<img src="imgs/exampleDeeptools.png" alt="igv" height="300" width="300">
+</div>
   ]
 .pull-right[
  <div align="center">
@@ -442,7 +446,7 @@ ZBTB1_GR
 ---
 ## GRanges
 
-The BED file regions are stored in R as a **GRanges** object. 
+The [BED file regions are stored in R as a **GRanges** object.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/GenomicIntervals_In_Bioconductor.html#1) 
 
 **GRanges** objects provide much of the functionality seen in **BedTools**.
 
@@ -499,7 +503,7 @@ The DeepTools software provides a set of tools to convert between file types (i.
 [Deeptools course for more information](https://rockefelleruniversity.github.io/RU_VisualizingGenomicsData/viz_course/Presentations/Slides/deeptools_lecture_20190208.html#2)
 
 <div align="center">
-<img src="imgs/exampleDeeptools.png" alt="igv" height="300" width="300">
+<img src="imgs/deeptools.png" alt="igv" height="400" width="500">
 </div>
 
 
@@ -615,7 +619,9 @@ generateEnrichedHeatmap(zbtb1_deeptools)
 ---
 ## Blacklist
 
-ChIP-seq will often show the presence of common artefacts such as ultra-high signal regions or Blacklists. Such regions can confound peak calling, fragment length estimation and QC metrics.
+ChIP-seq will often show the presence of common artefacts such as ultra-high signal regions or Blacklists. Such regions can confound peak calling, fragment length estimation and QC metrics. 
+
+For more information on Blacklists [see the Deeptools guide](https://deeptools.readthedocs.io/en/develop/content/feature/blacklist.html) or [our paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3989762/).
 
 <div align="center">
 <img src="imgs/blacklist.png" alt="igv" height="400" width="700">
@@ -628,7 +634,7 @@ ChIP-seq will often show the presence of common artefacts such as ultra-high sig
 ---
 ## Blacklist
 
-We can retrieve Blacklists from the Encode portal for human, rat and mouse. Here I have pre-downloaded the hg19 Blacklist as a file and put in the Beds directory.
+We can retrieve Blacklists from the [Encode portal for human and mouse](https://www.encodeproject.org/annotations/ENCSR636HFF/). Here I have pre-downloaded the hg19 Blacklist as a file and put in the Beds directory. 
 
 
 ```{r}
