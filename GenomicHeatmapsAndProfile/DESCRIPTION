@@ -1,11 +1,25 @@
-Package: PlottingInR
+Package: GenomicHeatmaps
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
-Date: 2018-03-17
-Author: Thomas Carroll
-Maintainer: Thomas Carroll <tcarroll@rockefeller.edu>
-Description: Course for plotting in R
+Title: Genomic Heatmaps in Bioconductor
+Version: 0.1.1
+Author: Thomas Carroll.
+Maintainer: Thomas Carroll <tc.infomatics@gmail>
+Description: More about what it does (maybe more than one line)
 License: What license is it under?
-Depends: ggplot2
+LazyData: TRUE
+biocViews: Training
+Depends: methods, ggplot2, rmarkdown, ShortRead, ashr, ChIPQC, DiffBind, 
+    BSgenome.Hsapiens.UCSC.hg19, Rsubread, Rbowtie2, R.utils, Rsamtools, BSgenome.Hsapiens.UCSC.hg38,
+    rtracklayer, ChIPseeker, soGGi, ChIPQC, GenomicAlignments, 
+    TxDb.Hsapiens.UCSC.hg19.knownGene, DESeq2, BSgenome.Mmusculus.UCSC.mm10, TxDb.Hsapiens.UCSC.hg38.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene, devtools, profileplyr,
+    tidyr, DT, dplyr, rGREAT, MotifDb, Biostrings, GenomicRanges, pheatmap,
+    TxDb.Mmusculus.UCSC.mm10.knownGene,org.Mm.eg.db
+Suggests: knitr,
+    rmarkdown,
+    testthat,
+    yaml
+SystemRequirements: R, RStudio, IGV
+VignetteBuilder: knitr
 RoxygenNote: 6.0.1
+
