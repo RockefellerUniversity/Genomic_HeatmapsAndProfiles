@@ -262,8 +262,6 @@ TotalMappedReads <- sum(MappedReads$mapped)
 ```
 
 ```{r countw2,cache=TRUE,warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
-
-MappedReads <- idxstatsBam("~/Desktop/Projects/brc/renvTest/AnotherTest2/BAMs/Sorted_shPTBP153_1.bam")
 TotalMappedReads <- 10302212
 TotalMappedReads
 ```
