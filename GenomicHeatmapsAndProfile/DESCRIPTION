@@ -1,8 +1,8 @@
 Package: GenomicHeatmaps
 Type: Package
 Title: Genomic Heatmaps in Bioconductor
-Version: 0.1.1
-Author: Thomas Carroll.
+Version: 0.1.2
+Author: BRC.
 Maintainer: Thomas Carroll <tc.infomatics@gmail>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
