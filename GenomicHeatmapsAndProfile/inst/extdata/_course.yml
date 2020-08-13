@@ -1,8 +1,0 @@
-Description:
-  CourseName: Genomic Heatmaps and Profiles
-  OverviewRmd: CourseOverview.Rmd
-Presentations:
-    titles: Session1
-    PresRmd: GenomicHeatmapsAndProfiles.Rmd
-    PresOverviewRmd: Session1Overview.Rmd
-    Exercises: GH_part1.Rmd

@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Genomic Heatmaps and Profiles</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
+    <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Genomic Heatmaps and Profiles
+### Rockefeller University, Bioinformatics Resource Centre
+### <a href="http://rockefelleruniversity.github.io/Genomic_HeatmapsAndProfiles/" class="uri">http://rockefelleruniversity.github.io/Genomic_HeatmapsAndProfiles/</a>
+
+---
+
+
+
+
+
+## Overview
+
+- Set up
+- Genomic Heatmaps
+- Making a simple heatmap
+- More complex heatmaps
+
+---
+class: inverse, center, middle
+
+# Set up
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+## Materials
+
+All prerequisites, links to material and slides for this course can be found on github.
+
+* [GenomicHeatmapsAndProfiles](https://rockefelleruniversity.github.io/GenomicHeatmapsAndProfiles/)
+
+Or can be downloaded as a zip archive from here.
+
+* [Download zip](https://github.com/rockefelleruniversity/GenomicHeatmapsAndProfiles/zipball/master)
+
+---
+## Presentations, source code and practicals
+
+Once the zip file in unarchived. All presentations as HTML slides and pages, their R code and HTML practical sheets will be available in the directories underneath.
+
+* **presentations/slides/**
+Presentations as an HTML slide show.
+* **presentations/singlepage/** 
+Presentations as an HTML single page.
+* **presentations/r_code/**
+R code in presentations.
+
+
+---
+## Set the Working directory
+
+
+Before running any of the code in the practicals or slides we need to set the working directory to the folder we unarchived. 
+
+You may navigate to the unarchived GenomicHeatmapsAndProfiles folder in the Rstudio menu.
+
+**Session -&gt; Set Working Directory -&gt; Choose Directory**
+
+or in the console.
+
+
+```r
+setwd("/PathToMyDownload/GenomicHeatmapsAndProfiles/r_course")
+# e.g. setwd("~/Downloads/Intro_To_R_1Day/r_course")
+```
+
+
+---
+class: inverse, center, middle
+
+# Raw data to visualisations
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+## Genomics data visualisations
+
+A common task in genomics is to review your data in your favourite genome browser.
+Here we are using IGV and [our material is available here](https://rockefelleruniversity.github.io/IGV_course/)
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/Broad_IGV.png" alt="offset" height="500" width="800"&gt;
+&lt;/div&gt;
+
+---
+## Genomics data visualisations
+
+To visualise our data we first need to get our data in a suitable format for visualisation. For more information on file formats see [our material is available here](https://rockefelleruniversity.github.io/Genomic_Data/)
+
+High throughput Sequencing data is typically delivered as unaligned sequences in [FastQ format](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#12).
+
+ **FastQ (FASTA with Qualities)**
+&lt;div align="center"&gt;
+&lt;img src="imgs/fq1.png" alt="igv" height="200" width="800"&gt;
+&lt;/div&gt;
+
+- "@" followed by identifier.
+- Sequence information.
+- "+" 
+- Quality scores encodes as ASCI.
+
+---
+## Genomics data visualisations
+
+We need to work with aligned data for visualisation and analysis in our genome of choice. Aligned sequence data is often stored in [SAM format](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#15).
+
+**SAM - Sequence Alignment Map**
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/sam2.png" alt="igv" height="200" width="800"&gt;
+&lt;/div&gt;
+
+- Contains read and alignment information including genomic location
+
+---
+## Genomics data visualisations
+
+Typically for visualisation in genome browsers we require only a subset of this information - Depth of reads/Signal at genomic locations. 
+We can then take advantage of more reduced formats such as [bedGraph](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#27) (an extension of [BED](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#27)).
+
+**bed(Browser Extensible Data)Graph**
+
+.pull-left[
+ &lt;div align="center"&gt;
+&lt;img src="imgs/bedgraph3.png" alt="igv" height="250" width="400"&gt;
+&lt;/div&gt;
+  ]
+.pull-right[
+- BED 3 format
+    - Chromosome
+    - Start 
+    - End
+    
+4th column - Score
+  ]
+
+
+
+---
+## Genomics data visualisations
+
+These format are easy for us to read but inefficent for software to work with. When using software we will most often work with [highly compressed and indexed equivalent files.](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#39)
+
+* SAM -- BAM (with a .bai index)
+* wig/bedGraph -- bigWig
+
+---
+class: inverse, center, middle
+
+# Raw data to visualisations in R (Quick)
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+## Full workflows available.
+
+In the next few slides we are going to run through an alignment of ChIP-seq FastQ to sorted and indexed BAM files and then create a bigWig.
+
+For a full summary of this processing please see our relevant courses
+
+* [RNA-seq](https://rockefelleruniversity.github.io/RU_RNAseq/)
+* [ChIP-seq](https://rockefelleruniversity.github.io/RU_ChIPseq/)
+* [ATAC-seq](https://rockefelleruniversity.github.io/RU_ATACseq/)
+
+---
+## A reference genome.
+
+To align our raw fastQ data we will need a reference genome in [FASTA format](https://rockefelleruniversity.github.io/Genomic_Data//r_course/presentations/slides/GenomicsData.html#9) to align against. 
+
+We can retrieve this from [Ensembl FTP](https://www.ensembl.org/info/data/ftp/index.html) download page for many organisms.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/Ensembl.png" alt="igv" height="400" width="700"&gt;
+&lt;/div&gt;
+
+---
+## A reference genome in R.
+
+We can also extract genomes from Bioconductor objects inside of R. Here we use the **BSgenome.Hsapiens.UCSC.hg19** to [extract the sequence for major chromosomes and write out to a FASTA file](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/SequencesInBioconductor.html#4).
+
+
+```r
+require(BSgenome.Hsapiens.UCSC.hg19)
+mainChromosomes &lt;- paste0("chr",c(1:22,"X","Y","M"))
+mainChrSeq &lt;- lapply(mainChromosomes,
+                     function(x)BSgenome.Hsapiens.UCSC.hg19[[x]])
+names(mainChrSeq) &lt;- mainChromosomes
+mainChrSeqSet &lt;- DNAStringSet(mainChrSeq)
+writeXStringSet(mainChrSeqSet,
+                "BSgenome.Hsapiens.UCSC.hg19_majorChr.fa")
+```
+
+---
+## FastQ to BAM and bigWigs.
+
+Once we have the FASTA file available we can [prepare the index of FASTA for alignment using the Rsubread package](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#39).
+The **indexSplit** paramter here will save us memory in alignment but may cost us some speed.
+
+
+```r
+require(Rsubread)
+buildindex("BSgenome.Hsapiens.UCSC.hg19",
+           "BSgenome.Hsapiens.UCSC.hg19_majorChr.fa",
+           indexSplit = TRUE)
+```
+
+---
+## FastQ to BAM and bigWigs.
+
+Once we have our index we can [align our FastQ to the genome using the **align** function](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#40) to create a BAM file.
+
+
+```r
+align("BSgenome.Hsapiens.UCSC.hg19",
+      "ENCFF001NQP.fastq.gz",
+      output_file="ENCFF001NQP.bam",
+      type="dna")
+```
+---
+## FastQ to BAM and bigWigs.
+
+We can then [sort and index this BAM file to be ready for use in external software by using the R interfact to samtools (Rsamtools)](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#19)
+
+
+```r
+require(Rsamtools)
+sortBam("ENCFF001NQP.bam","Sorted_ENCFF001NQP")
+indexBam("Sorted_ENCFF001NQP.bam")
+```
+
+---
+## FastQ to BAM and bigWigs.
+
+Now we have a indexed BAM file we can easily extract the total mapped reads.
+
+
+```r
+MappedReads &lt;- idxstatsBam("Sorted_ENCFF001NQP.bam")
+TotalMappedReads &lt;- sum(MappedReads$mapped)
+```
+
+
+```
+## [1] 10302212
+```
+
+---
+## Make a bigWig.
+
+We can then make our bigWig in a few lines of R [using the **rtracklayer** package.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/Summarising_Scores_In_Bioconductor.html#24)
+
+
+```r
+require(rtracklayer)
+coverageOverGenome &lt;- coverage("Sorted_ENCFF001NQP.bam",
+                               weight = (10^6)/TotalMappedReads)
+export.bw(coverageOverGenome,con="Sorted_ENCFF001NQP.bw")
+```
+
+---
+class: inverse, center, middle
+
+# Visualising signal over multiple genomic regions
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+## Review in IGV
+
+We can easily review our signal data in IGV at a simgle locus to assess the relationship between samples/conditions/antibodies.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/ASNS_IGV2.png" alt="offset" height="600" width="800"&gt;
+&lt;/div&gt;
+
+---
+## Multipanel review in IGV
+
+In IGV we can also review multiple loci in one screen to get an overview of signal over a group of regions.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/REACTOME_IGV2.png" alt="offset" height="400" width="800"&gt;
+&lt;/div&gt;
+
+
+---
+## Visualisation in heatmaps
+
+Often we want to review signal within and between samples/conditions over 1000s of sites. To do this we can take advantage of genomic heatmaps and profiles.
+
+.pull-left[
+Two major softwares to produce genomic heatmaps
+* Deeptools
+* EnrichedHeatmap
+  ]
+.pull-right[
+ &lt;div align="center"&gt;
+&lt;img src="imgs/deeptools.png" alt="igv" height="200" width="200"&gt;
+&lt;/div&gt;
+ &lt;div align="center"&gt;
+&lt;img src="imgs/enrichedheatmap.png" alt="igv" height="200" width="200"&gt;
+&lt;/div&gt;
+  ]
+
+
+
+---
+## ProfilePlyr package
+
+Many requests for complex heatmaps and summary statistics of data visualised within.
+
+.pull-left[
+Profileplyr is available from Bioconductor and developed with Doug Barrows to 
+- Allow import/export between Deeptools and R framework
+- Provide easy tools to manipulate and summarise heatmap data.
+  ]
+.pull-right[
+ &lt;div align="center"&gt;
+&lt;img src="imgs/ppplyer.png" alt="igv" height="400" width="400"&gt;
+&lt;/div&gt;
+]
+
+---
+## Getting hold of DeepTools
+
+You will not require Deeptools to follow the course but if you would like to install this can be done easily through [Conda](https://anaconda.org/bioconda/deeptools) or [Docker](https://deeptools.readthedocs.io/en/develop/content/installation.html#installation-with-docker).
+
+For more information on [Deeptools you can see our course here.](https://rockefelleruniversity.github.io/RU_VisualizingGenomicsData/viz_course/Presentations/Slides/deeptools_lecture_20190208.html#1)
+&lt;div align="center"&gt;
+&lt;img src="imgs/bioconda_deeeptools.png" alt="igv" height="400" width="600"&gt;
+&lt;/div&gt;
+
+---
+## Getting hold of data.
+
+First we need to get hold of some data to plot. 
+
+For demonstration we will take a small processed data set of bigWigs from a paper containing ChIP-seq for the transcription factos ZBTB1 and ATf4.
+
+We can retrieve raw and processed data for GSM4332935, GSM4332934 and GSM4332944 directly from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE145783).
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/GEO.png" alt="igv" height="375" width="800"&gt;
+&lt;/div&gt;
+
+---
+## Getting hold of data.
+
+We can also use some of the tools in Bioconductor to retrieve supplementary files from GEO directly.
+
+To do this we will use the GEOquery package. We can install this following the commands on the Bioconductor page for [GEOquery](https://www.bioconductor.org/packages/release/bioc/html/GEOquery.html).
+
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("GEOquery")
+```
+
+
+---
+## Getting hold of data.
+
+We can use the **getGEOSuppFiles** function to download any supplementary files to our local working directory.
+
+
+```r
+require(GEOquery)
+
+GSM4332935_BigWig &lt;- getGEOSuppFiles("GSM4332935",fetch_files = TRUE,
+                                     makeDirectory = FALSE,
+                                     filter_regex = "*.bw")
+GSM4332934_BigWig &lt;- getGEOSuppFiles("GSM4332934",fetch_files = TRUE,
+                                     makeDirectory = FALSE,
+                                     filter_regex = "*.bw")
+GSM4332944_BigWig &lt;- getGEOSuppFiles("GSM4332944",fetch_files = TRUE,
+                                     makeDirectory = FALSE,
+                                     filter_regex = "*.bw")
+```
+
+
+
+---
+## Regions of interest
+
+
+
+We want to plot our signal over selected sets of regions. We will import our regions from a BED file using the import.bed function in **rtracklayer** package
+
+```r
+require(rtracklayer)
+ZBTB1_GR &lt;- import.bed("Beds/ZBTB1Peaks.bed")
+ZBTB1_GR
+```
+
+```
+## GRanges object with 593 ranges and 2 metadata columns:
+##         seqnames              ranges strand |                      name
+##            &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |               &lt;character&gt;
+##     [1]     chr2   70660347-70663275      * |    chr2:70660347-70663275
+##     [2]    chr12     6036980-6042542      * |     chr12:6036980-6042542
+##     [3]    chr13 113526647-113528481      * | chr13:113526647-113528481
+##     [4]     chr5       881483-884047      * |        chr5:881483-884047
+##     [5]    chr17   79397761-79400379      * |   chr17:79397761-79400379
+##     ...      ...                 ...    ... .                       ...
+##   [589]    chr11     9024476-9026040      * |     chr11:9024476-9026040
+##   [590]     chr1   58387303-58388627      * |    chr1:58387303-58388627
+##   [591]    chr17   32834453-32835985      * |   chr17:32834453-32835985
+##   [592]     chrY   13683928-13693098      * |    chrY:13683928-13693098
+##   [593]    chr10   90901936-90905010      * |   chr10:90901936-90905010
+##             score
+##         &lt;numeric&gt;
+##     [1]         0
+##     [2]         0
+##     [3]         0
+##     [4]         0
+##     [5]         0
+##     ...       ...
+##   [589]         0
+##   [590]         0
+##   [591]         0
+##   [592]         0
+##   [593]         0
+##   -------
+##   seqinfo: 24 sequences from an unspecified genome; no seqlengths
+```
+
+
+---
+## GRanges
+
+The BED file regions are stored in R as a **GRanges** object. 
+
+**GRanges** objects provide much of the functionality seen in **BedTools**.
+
+
+```r
+ZBTB1_GR
+```
+
+```
+## GRanges object with 593 ranges and 2 metadata columns:
+##         seqnames              ranges strand |                      name
+##            &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |               &lt;character&gt;
+##     [1]     chr2   70660347-70663275      * |    chr2:70660347-70663275
+##     [2]    chr12     6036980-6042542      * |     chr12:6036980-6042542
+##     [3]    chr13 113526647-113528481      * | chr13:113526647-113528481
+##     [4]     chr5       881483-884047      * |        chr5:881483-884047
+##     [5]    chr17   79397761-79400379      * |   chr17:79397761-79400379
+##     ...      ...                 ...    ... .                       ...
+##   [589]    chr11     9024476-9026040      * |     chr11:9024476-9026040
+##   [590]     chr1   58387303-58388627      * |    chr1:58387303-58388627
+##   [591]    chr17   32834453-32835985      * |   chr17:32834453-32835985
+##   [592]     chrY   13683928-13693098      * |    chrY:13683928-13693098
+##   [593]    chr10   90901936-90905010      * |   chr10:90901936-90905010
+##             score
+##         &lt;numeric&gt;
+##     [1]         0
+##     [2]         0
+##     [3]         0
+##     [4]         0
+##     [5]         0
+##     ...       ...
+##   [589]         0
+##   [590]         0
+##   [591]         0
+##   [592]         0
+##   [593]         0
+##   -------
+##   seqinfo: 24 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Overlaps in GRanges
+
+One of the most useful function for GRanges objects is the ability to intersect/overlap differing regions.
+
+To demonstate first we will read in a BED file of promoter positions for hg19.
+
+
+
+
+```r
+require(rtracklayer)
+promoter_positions &lt;- import.bed("Beds/Promoter_Positions.bed")
+promoter_positions
+```
+
+```
+## GRanges object with 23056 ranges and 2 metadata columns:
+##           seqnames              ranges strand |        name     score
+##              &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;numeric&gt;
+##       [1]    chr19   58874015-58876214      - |           1         0
+##       [2]     chr8   18246755-18248954      + |          10         0
+##       [3]    chr20   43280177-43282376      - |         100         0
+##       [4]    chr18   25757246-25759445      - |        1000         0
+##       [5]     chr1 244006687-244008886      - |       10000         0
+##       ...      ...                 ...    ... .         ...       ...
+##   [23052]     chr9 115095745-115097944      - |        9991         0
+##   [23053]    chr21   35734323-35736522      + |        9992         0
+##   [23054]    chr22   19109768-19111967      - |        9993         0
+##   [23055]     chr6   90537619-90539818      + |        9994         0
+##   [23056]    chr22   50964706-50966905      - |        9997         0
+##   -------
+##   seqinfo: 39 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Overlaps in GRanges
+
+The function **%over%** allows us to evaluate which regions overlap/intersect between two region sets.
+
+* A[A %over% B] -- Returns all regions in A which overlap regions in B
+* B[B %over% A] -- Returns all regions in B which  overlap regions in A
+* A[!A %over% B] -- Returns all regions in A which do not overlap regions in B
+
+---
+## Overlaps in GRanges
+
+So in practice we can easily extract our ZBTB1 peaks which do or do not overlap with promoters.
+We can then use the **export.bed** function to write the overlapping GRanges to a BED file
+
+
+```r
+ZBTB1_In_Promoters &lt;- ZBTB1_GR[ZBTB1_GR %over% promoter_positions]
+ZBTB1_Outside_Promoters &lt;- ZBTB1_GR[!ZBTB1_GR %over% promoter_positions]
+export.bed(ZBTB1_In_Promoters,
+           con="Beds/ZBTB1_In_Promoters.bed")
+```
+
+
+---
+## Heatmaps in Deeptools
+The DeepTools software provides a set of tools to convert between file types (i.e. BAM to bigWig) and to plot signal from BAM or bigWig over a set of regions as a heatmap. 
+
+[Deeptools course for more information](https://rockefelleruniversity.github.io/RU_VisualizingGenomicsData/viz_course/Presentations/Slides/deeptools_lecture_20190208.html#2)
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/exampleDeeptools.png" alt="igv" height="300" width="300"&gt;
+&lt;/div&gt;
+
+
+---
+## Heatmaps in Deeptools
+
+Two main workhorse functions allow you create these heatmaps in deeptools 
+
+* computeMatrix - Create an intermediate file of signal for heatmap.
+* plotHeatmap - Generate the heatmaps from intermediate file.
+
+---
+## Creating GenomicHeatmaps
+
+
+```bash
+computeMatrix reference-point --referencePoint center 
+-bs binSize -a BP_after_BED -b BP_before_BED 
+-S  BIGWIGSofINTEREST 
+--regionsFileName BEDFILEOFINTEREST 
+--outFileName OUTFILE
+
+```
+
+The computeMatrix function take a set of arguments to generate an intermediate file
+
+* reference-point --referencePoint  = Specify position in regions in BED file to centre heatmap.
+* -bs  = Binsize across regions in BED file
+* -b and -a = bp before and after reference point to plot in heatmap.
+* -S = BigWigs to plot signal from
+* --regionsFileName = BED file containing regions to plot over.
+* --outFileName = Name of intermediate file generated.
+
+---
+## Creating GenomicHeatmaps
+
+Using our data, the command looks like this.
+
+```bash
+computeMatrix reference-point --referencePoint center 
+-bs 50 -a 2000 -b 2000 -p 4 
+-S  GSM4332935_Sorted_GFP_MinusN_FLAGNormalised.bw GSM4332940_Sorted_GFP_PlusN_FLAGNormalised.bw GSM4332945_Sorted_ZBTB_MinusN_FLAGNormalised.bw GSM4332950_Sorted_ZBTB_PlusN_FLAGNormalised.bw 
+--regionsFileName ZBTB1Peaks.bed 
+--outFileName Deeptools_ZBTB1Peaks.MAT 
+```
+
+---
+## Creating GenomicHeatmaps
+
+Once we have our intermediate file we can use this to create our heatmap using the **plotHeatmap** command.
+
+```bash
+plotHeatmap -m MATRIXFILE 
+-o HEATMAP
+--colorList lowColour,highColour 
+```
+
+* -m  = Name of intermediate file generated by Deeptools computeMatrix.
+* -o  = Output file name for heatmap
+* --colorList = Bottom and top of colour scale for heatmap.
+
+---
+## Creating GenomicHeatmaps
+
+We our data, the plotHeatmap command would be.
+
+```bash
+plotHeatmap -m Deeptools_ZBTB1Peaks.MAT 
+-o Deeptools_ZBTB1Peaks.MAT.png 
+--colorList white,darkred 
+```
+&lt;div align="center"&gt;
+&lt;img src="imgs/Deeptools_ZBTB1Peaks.MAT.png" alt="igv" height="400" width="400"&gt;
+&lt;/div&gt;
+
+
+
+---
+## Creating GenomicHeatmaps
+
+The profileplyr package offers a similar set of functionality as the Deeptools software within R. 
+To compute our intermediate matrix we can use the **BamBigwig_to_chipProfile** function with the same set of inputs as Deeptools.
+
+
+```r
+require(profileplyr)
+bigWigs &lt;- dir(full.names=TRUE,pattern = "FLAG")
+zbtb1_profile &lt;- BamBigwig_to_chipProfile(bigWigs,
+                                   testRanges = "Beds/ZBTB1Peaks.bed",
+                                   style = "point",
+                                   format = "bigwig",
+                                   distanceAround = 2000)
+
+zbtb1_profile &lt;- as_profileplyr(zbtb1_profile)
+zbtb1_profile
+```
+
+```
+## class: profileplyr 
+## dim: 593 200 
+## metadata(0):
+## assays(4): GSM4332935_Sorted_GFP_MinusN_FLAGNormalised.bw
+##   GSM4332940_Sorted_GFP_PlusN_FLAGNormalised.bw
+##   GSM4332945_Sorted_ZBTB_MinusN_FLAGNormalised.bw
+##   GSM4332950_Sorted_ZBTB_PlusN_FLAGNormalised.bw
+## rownames(593): giID450 giID451 ... giID562 giID563
+## rowData names(5): name score sgGroup giID names
+## colnames: NULL
+## colData names(0):
+```
+
+---
+## Creating GenomicHeatmaps
+
+We can then use the **generateEnrichedHeatmap** function to create a heatmap as we did in Deeptools.
+
+
+```r
+generateEnrichedHeatmap(zbtb1_profile)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/zbtb1_1plot-1.png)&lt;!-- --&gt;
+
+---
+## Import from DeepTools 
+
+However you generate the intermediate file, you can import/export to Deeptools. This allows you take advantage of any functionality in Deeptools and R together.
+
+
+```r
+zbtb1_deeptools &lt;- import_deepToolsMat("Deeptools_ZBTB1Peaks.MAT")
+generateEnrichedHeatmap(zbtb1_deeptools)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/zbtb1_1Deeptools-1.png)&lt;!-- --&gt;
+---
+## Blacklist
+
+ChIP-seq will often show the presence of common artefacts such as ultra-high signal regions or Blacklists. Such regions can confound peak calling, fragment length estimation and QC metrics.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/blacklist.png" alt="igv" height="400" width="700"&gt;
+&lt;/div&gt;
+
+
+
+
+
+---
+## Blacklist
+
+We can retrieve Blacklists from the Encode portal for human, rat and mouse. Here I have pre-downloaded the hg19 Blacklist as a file and put in the Beds directory.
+
+
+
+```r
+blacklist &lt;- rtracklayer::import("Beds/ENCFF001TDO.bed.gz")
+blacklist
+```
+
+```
+## GRanges object with 411 ranges and 2 metadata columns:
+##         seqnames            ranges strand |                    name     score
+##            &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |             &lt;character&gt; &lt;numeric&gt;
+##     [1]     chr1     564450-570371      * | High_Mappability_island      1000
+##     [2]     chr1     724137-727043      * |        Satellite_repeat      1000
+##     [3]     chr1     825007-825115      * |                BSR/Beta      1000
+##     [4]     chr1   2583335-2634374      * |  Low_mappability_island      1000
+##     [5]     chr1   4363065-4363242      * |                (CATTC)n      1000
+##     ...      ...               ...    ... .                     ...       ...
+##   [407]     chrY 28555027-28555353      * |                    TAR1      1000
+##   [408]     chrY 28784130-28819695      * |        Satellite_repeat      1000
+##   [409]     chrY 58819368-58917648      * |                (CATTC)n      1000
+##   [410]     chrY 58971914-58997782      * |                (CATTC)n      1000
+##   [411]     chrY 59361268-59362785      * |                    TAR1      1000
+##   -------
+##   seqinfo: 25 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Creating GenomicHeatmaps
+
+The **groupBy** by function allows us to add additional information to our Heatmaps. Here we provide the GRanges of our Blacklist BED file and specify to include sites which do not overlap using the **include_nonoverlapping** argument.
+
+
+```r
+zbtb1_profile_Grouped &lt;- groupBy(zbtb1_profile,
+                                 group = blacklist,
+                                 include_nonoverlapping = TRUE)
+generateEnrichedHeatmap(zbtb1_profile_Grouped)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/grouped-1.png)&lt;!-- --&gt;
+
+---
+## Creating GenomicHeatmaps
+
+We can take advantage of the same **%over%** function we saw earlier with GRanges to filter to just ranges in heatmap which do not overlap our blacklist regions.
+
+
+```r
+zbtb1_profile_bl &lt;- zbtb1_profile[!zbtb1_profile %over% blacklist]
+generateEnrichedHeatmap(zbtb1_profile_bl)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/bled-1.png)&lt;!-- --&gt;
+
+---
+## Creating GenomicHeatmaps
+
+Now we have created our filtered set we could export it back to Deeptools to plot using it's plotHeatmap function.
+
+
+```r
+export_deepToolsMat(zbtb1_profile_bl,
+                    con="zbtb1_Profileplyr.MAT",
+                    overwrite = TRUE)
+```
+
+
+---
+## Creating GenomicHeatmaps
+
+```bash
+
+plotHeatmap -m zbtb1_Profileplyr.MAT.gz 
+            -o zbtb1_Profileplyr.MAT.png 
+            --colorList white,darkred
+```
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/zbtb1_Profileplyr.MAT.png" alt="igv" height="400" width="700"&gt;
+&lt;/div&gt;
+
+
+
+---
+## Subsetting 
+
+We can subset our heatmap to only review the samples we want using indexing in R.
+
+Our heatmaps have 3 dimension - Ranges/Rows, Bins/Columns, Samples. To subset samples then we can index our profileplyr object as in standard R.
+
+
+```r
+zbtb1_profile_subset &lt;- zbtb1_profile_bl[,,3:4]
+generateEnrichedHeatmap(zbtb1_profile_subset)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/zbtb_Sub-1.png)&lt;!-- --&gt;
+
+---
+## Joining heatmaps.
+
+We can also combine heatmaps when they are processed over the same BED file. Here we plot the ATF4 bigwig over the ZBTB1 peaks as we did earlier for ZBTB1 bigwigs.
+
+
+```r
+bigWigs &lt;- dir(full.names=TRUE,pattern = "ATF4")
+atf4_profile &lt;- BamBigwig_to_chipProfile(bigWigs,
+                                   testRanges = "Beds/ZBTB1Peaks.bed",
+                                   style = "point",
+                                   format = "bigwig",distanceAround = 2000)
+```
+
+```
+## Loading bigwig files.
+```
+
+```
+## Making ChIPprofile object from signal files.
+```
+
+```
+## Importing rlelist..Done
+## Filtering regions which extend outside of genome boundaries.....Done
+## Filtered 0 of 593 regions
+## Splitting regions by Watson and Crick strand....Done
+## ..Done
+## Found 593 Watson strand regions
+## Found 0 Crick strand regions
+## Extending regions.....done
+## Calculating coverage across regions
+## Calculating per contig. 
+## contig: 1
+## contig: 2
+## contig: 3
+## contig: 4
+## contig: 5
+## contig: 6
+## contig: 7
+## contig: 8
+## contig: 9
+## contig: 10
+## contig: 11
+## contig: 12
+## contig: 13
+## contig: 14
+## contig: 15
+## contig: 16
+## contig: 17
+## contig: 18
+## contig: 19
+## contig: 20
+## contig: 21
+## contig: 22
+## contig: 23
+## contig: 24
+## Creating ChIPprofile.
+```
+
+```r
+atf4_profile &lt;- as_profileplyr(atf4_profile)
+atf4_profile_bl &lt;- atf4_profile[!atf4_profile %over% blacklist]
+```
+
+---
+## Joining samples 
+
+We can then join our ZBTB1 and ATF4 bigwigs using the common R combine function **c()**.
+
+```r
+ztbtb1Andatf4_profile &lt;- c(zbtb1_profile_subset,atf4_profile_bl)
+generateEnrichedHeatmap(ztbtb1Andatf4_profile)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/JoinAndPlot-1.png)&lt;!-- --&gt;
+
+---
+## Updating sample names
+
+Sample names in these heatmaps are by default based on the name of the input bigwigs. We can update the samplenames using the **rownames()** and **sampleData()** functions with our profileplyr object.
+
+
+```r
+rownames(sampleData(ztbtb1Andatf4_profile)) &lt;- c("ZBTB1_1","ZBTB1_2","ATF4_1")
+generateEnrichedHeatmap(ztbtb1Andatf4_profile)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/sampleUpdate-1.png)&lt;!-- --&gt;
+---
+## Updating sample names
+
+We can directly change the sample names when plotting the heatmap too by using the **sample_names** argument.
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_profile,
+                        sample_names=c("zbtb_A","zbtb_B","atf4_A"))
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/sampleUpdate22-1.png)&lt;!-- --&gt;
+
+---
+## Updating sample information
+
+We can also use the **sampleData()** function to add any additional information to our samples. Here we add information on Antibody.
+
+We can add any arbitary column name we need using the **sampleData()** function.
+
+
+```r
+sampleData(ztbtb1Andatf4_profile)$Antibody &lt;- c("ZBTB1","ZBTB1","ATF4")
+sampleData(ztbtb1Andatf4_profile)$Grade &lt;- c("Favourite","Good","Good")
+```
+
+---
+## Updating sample information
+
+We can use the information on samples then when we plot our heatmap. Here we tell the **generateEnrichedHeatmap()** function to colour our heatmaps by their Antibody information we just added.
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_profile,
+                        color_by_sample_group = "Antibody")
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/sampleUpdatePlot-1.png)&lt;!-- --&gt;
+
+
+
+---
+## Clustering ranges by summarised signal
+
+Often we want to group ranges across samples by the signal within them. The profileplyr package allows the user to summarise signal within a region and cluster rows according to user defined metrics.
+
+Here we summarise each range by taking the sum of signal within ranges specified in the **fun** paramter and create two clusters from the data specifed by the **cutree_rows** paramter.
+
+```r
+ztbtb1Andatf4_profile &lt;- clusterRanges(ztbtb1Andatf4_profile,
+                        fun = rowSums,
+                        cutree_rows = 2)
+```
+
+```
+## Hierarchical clustering used. It is advised to avoid this option with large matrices as the clustering can take a long time. Kmeans is more suitable for large matrices.
+```
+
+```
+## A column has been added to the range metadata with the column name 'cluster', and the 'rowGroupsInUse' has been set to this column.
+```
+
+---
+## Clustering ranges by summarised signal
+
+We can now review the clustering by simply passing the new profileplyr object to the **generateEnrichedHeatmap** function.
+
+We can see that it has created two clusters which appear to contain high or low ATF4 signal.
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_profile,
+                        color_by_sample_group = "Antibody")
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/clusterAndPlot2-1.png)&lt;!-- --&gt;
+
+
+```
+## New names:
+## * `` -&gt; ...2
+## * `` -&gt; ...3
+## * `` -&gt; ...4
+## * `` -&gt; ...5
+## * `` -&gt; ...6
+## * ...
+```
+
+---
+## Adding Groups with names. 
+
+If we have an additional set of regions which we wish to assess the overall ATF4 signal within, we can use the **groupBy** fnction again to add this information. Here we additionally specify group names in the **GRanges_names** argument.
+
+
+```r
+ATF4ANDZBTB1_Peaks &lt;- import.bed("Beds/ATF4ANDZBTB1_Within2000kb.bed")
+ztbtb1Andatf4_profile &lt;- groupBy(ztbtb1Andatf4_profile,
+                                 group = ATF4ANDZBTB1_Peaks,
+                                 GRanges_names = "ProximalPeaks",
+                                 include_nonoverlapping = TRUE)
+```
+
+```
+## A column has been added to the range metadata with the column name 'GR_overlap_names' that specifies the GRanges each range overlaps with, but the inherited groups are not included.
+```
+
+---
+## Joining samples 
+
+If we wish to now review the relationship between the clustering and the GRanges group we can use the **extra_annotation_columns** argument to specify additional information to add to the Heatmap.
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_profile,
+                        color_by_sample_group = "Antibody",
+                        extra_annotation_columns = "cluster")
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/groupAndPlot2-1.png)&lt;!-- --&gt;
+
+---
+## Summarising
+
+Now we have our heatmap organised as we require, we may wish to assess the differences in signal within the clusters over the heatmap. 
+
+The **summarize** function allows us to again summarise the ranges by a user-defined metric and export the results as a data.frame suitbale for plotting. 
+
+
+```r
+ztbtb1Andatf4_summarized &lt;- summarize(ztbtb1Andatf4_profile,
+                        rowSums,
+                        output="long",
+                       sampleData_columns_for_longPlot = "Antibody")
+ztbtb1Andatf4_summarized[1:4,]
+```
+
+```
+##   GR_overlap_names          combined_ranges  Sample    Signal Antibody
+## 1    ProximalPeaks   chr1_21042561_21046561 ZBTB1_1 191.10911    ZBTB1
+## 2    ProximalPeaks chr1_181127059_181131059 ZBTB1_1 311.86117    ZBTB1
+## 3    ProximalPeaks     chr1_9469096_9473096 ZBTB1_1  95.21104    ZBTB1
+## 4    ProximalPeaks   chr1_44494345_44498345 ZBTB1_1 136.83766    ZBTB1
+```
+
+---
+## Plotting
+
+Now we have our long format data.frame ready we can pass this to ggplot to visualise as violin plots.
+
+
+```r
+require(ggplot2)
+ggplot(ztbtb1Andatf4_summarized,
+       aes(y=Signal,x=Sample,fill=GR_overlap_names))+
+  facet_wrap(Antibody~.,scales = "free")+
+  geom_violin()+scale_y_log10()
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/summarisePlot-1.png)&lt;!-- --&gt;
+
+
+---
+## Annotating ranges
+
+So far we have been working with genomic locations without any annotation to genes they may regulate.
+
+We can easily annotate our ranges in R using the GREAT software in profileplyr by using the annotateRanges_great function.
+
+
+```r
+ztbtb1Andatf4_profile &lt;- annotateRanges_great(ztbtb1Andatf4_profile,
+                                              species = "hg19")
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/annotate-1.png)&lt;!-- --&gt;
+
+---
+## Annotating to genes
+
+All the annotation is now contained in the row information for the profileplyr object and can be retieved using the **rowRanges()** function.
+
+
+```r
+annotatedRanges &lt;- rowRanges(ztbtb1Andatf4_profile)
+annotatedRanges[1,]
+```
+
+```
+## GRanges object with 1 range and 13 metadata columns:
+##           seqnames          ranges strand |                 name     score
+##              &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |          &lt;character&gt; &lt;numeric&gt;
+##   giID484     chr1 1508087-1512087      + | chr1:1508899-1511276         0
+##                  sgGroup     giID                names  cluster
+##                 &lt;factor&gt; &lt;factor&gt;             &lt;factor&gt; &lt;factor&gt;
+##   giID484 ZBTB1Peaks.bed  giID484 chr1:1508899-1511276        1
+##           hierarchical_order overlap_matrix GR_overlap_names      name.1
+##                    &lt;integer&gt;       &lt;matrix&gt;         &lt;factor&gt; &lt;character&gt;
+##   giID484                252              0       no_overlap        &lt;NA&gt;
+##             score.1      SYMBOL distanceToTSS
+##           &lt;numeric&gt; &lt;character&gt;     &lt;numeric&gt;
+##   giID484      &lt;NA&gt;       SSU72           162
+##   -------
+##   seqinfo: 24 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Annotating to genes
+
+If we want to we can write this information to a table to review in outher software or a BED file to review in IGV.
+
+
+```r
+write.table(annotatedRanges,"annotatedRanges.csv",sep=",",row.names=FALSE)
+export.bed(annotatedRanges,"annotatedRanges.bed")
+```
+
+---
+## Annotating to genes
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_profile,
+                        color_by_sample_group = "Antibody",
+                        extra_annotation_columns = "cluster",
+                        genes_to_label = "ASNS",
+                        gene_label_font_size = 18)
+```
+
+![](GenomicHeatmapsAndProfiles_course_files/figure-html/annotated3-1.png)&lt;!-- --&gt;
+
+---
+##
+
+
+
+```r
+require(magrittr)
+ztbtb1Andatf4_Grouped &lt;- groupBy(ztbtb1Andatf4_hclust,
+                                 ATF4ANDZBTB1peaks_GR,
+                                 include_nonoverlapping = TRUE)
+generateEnrichedHeatmap(ztbtb1Andatf4_Grouped,
+                        all_color_scales_equal = FALSE,
+                        extra_annotation_columns = "cluster")
+```
+
+
+
+```r
+require(magrittr)
+longFrame &lt;- summarize(ztbtb1Andatf4_Grouped,
+                        rowSums,
+                        output="long",sampleData_columns_for_longPlot = "Antibody")
+```
+
+
+```r
+require(ggplot2)
+ggplot(longFrame,
+       aes(y=Signal,x=Sample,fill=GR_overlap_names))+facet_wrap(Antibody~.,scales = "free")+
+  geom_boxplot()+scale_y_log10()
+```
+
+
+```r
+require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+
+ztbtb1Andatf4_Grouped_anno &lt;- annotateRanges(ztbtb1Andatf4_Grouped,
+                           TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene,
+                           annoDb = "org.Hs.eg.db")
+```
+
+
+```r
+generateEnrichedHeatmap(ztbtb1Andatf4_Grouped,
+                        all_color_scales_equal = FALSE,
+                        genes_to_label = c("ASNS"))
+```
+
+
+```r
+ztbtb1Andatf4_Grouped_Great &lt;- annotateRanges_great(ztbtb1Andatf4_Grouped,species = "hg19")
+generateEnrichedHeatmap(ztbtb1Andatf4_Grouped_Great,
+                        all_color_scales_equal = FALSE,
+                        genes_to_label = c("ASNS"))
+
+ztbtb1Andatf4_Grouped_Great &lt;- summarize(ztbtb1Andatf4_Grouped,
+                                          rowSums,
+                                          output="object")
+
+
+export_deepToolsMat(ztbtb1Andatf4_Grouped_Great,con = "~/Downloads/Test_Deeptools.MAT")
+# plotHeatmap -m ~/Downloads/Test_Deeptools.MAT.gz -o ~/Downloads/Test_DP.png --zMax 3 3 1 --zMin 0.4 0.4 0.3 --colorList white,darkred white,darkred white,black 
+```
+# Contact
+
+Any suggestions, comments, edits or questions (about content or the slides themselves) please reach out to our [GitHub](https://github.com/RockefellerUniversity/Genomic_HeatmapsAndProfiles/issues) and raise an issue.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

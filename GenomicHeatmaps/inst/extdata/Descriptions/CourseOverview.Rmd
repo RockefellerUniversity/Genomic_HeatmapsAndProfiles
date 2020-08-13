@@ -1,0 +1,13 @@
+## Course Overview
+
+<br>
+[<img src="https://github.com/RockefellerUniversity/RU_ATACseq/workflows/R-CMD-check-bioc/badge.svg">](https://github.com/RockefellerUniversity/RU_ATACseq/actions?query=workflow%3AR-CMD-check-bioc)
+
+This course introduces plotting and importing Genomic Heatmaps in R.
+
+The course consists of 1 sections on plotting and importing Genomic Heatmaps in R.<br>
+Each section is presented as HTML presentations or single page document. Exercises and answer sheets are included after all subsections to practice techniques and provide future reference examples. 
+
+Course material and exercises are available to view as rendered HTML at https://rockefelleruniversity.github.io/RU_ATACseq/.
+All material is available to download under GPL v2 license.
+
