@@ -13,7 +13,7 @@ Depends: methods, ggplot2, rmarkdown, ShortRead, ashr, ChIPQC, DiffBind,
     rtracklayer, ChIPseeker, soGGi, ChIPQC, GenomicAlignments, 
     TxDb.Hsapiens.UCSC.hg19.knownGene, DESeq2, BSgenome.Mmusculus.UCSC.mm10, TxDb.Hsapiens.UCSC.hg38.knownGene,
     TxDb.Mmusculus.UCSC.mm10.knownGene, devtools, profileplyr,
-    tidyr, DT, dplyr, rGREAT, MotifDb, Biostrings, GenomicRanges, pheatmap,
+    tidyr, DT, dplyr, rGREAT, MotifDb, Biostrings, GenomicRanges, pheatmap, GEOquery
     TxDb.Mmusculus.UCSC.mm10.knownGene,org.Mm.eg.db
 Suggests: knitr,
     rmarkdown,
