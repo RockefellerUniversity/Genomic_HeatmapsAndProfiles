@@ -400,7 +400,7 @@ GSM4332934_BigWig <- getGEOSuppFiles("GSM4332934",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
 
-GSM4332944_BigWig <- getGEOSuppFiles("GSM4332944",fetch_files = TRUE,
+GSM4332944_BigWig <- getGEOSuppFiles("GSM4332945",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
 
