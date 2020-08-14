@@ -696,7 +696,7 @@ We can subset our heatmap to only review the samples we want using indexing in R
 
 Our heatmaps have 3 dimension - Ranges/Rows, Bins/Columns, Samples. To subset samples then we can index our profileplyr object as in standard R.
 
-```{r zbtb_Sub,echo=TRUE,eval=TRUE,cache=TRUE,dependson="plotPromoters",fig.width = 10,fig.height = 5}
+```{r zbtb_Sub,echo=TRUE,eval=TRUE,cache=TRUE,fig.width = 10,fig.height = 5}
 zbtb1_profile_subset <- zbtb1_profile_bl[,,3:4]
 generateEnrichedHeatmap(zbtb1_profile_subset)
 
