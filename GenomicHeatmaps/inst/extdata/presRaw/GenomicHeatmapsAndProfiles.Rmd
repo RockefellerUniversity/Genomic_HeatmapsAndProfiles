@@ -3,13 +3,6 @@ title: "Genomic Heatmaps and Profiles"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/Genomic_HeatmapsAndProfiles/"
 output: 
-  html_document:
-    toc: true # table of content true
-    toc_float: yes
-    depth: 3  # upto three depths of headings (specified by #, ## and ###)
-    number_sections: false  ## if you want number sections at each table header
-    theme: united  # many options for theme, this one is my favorite.
-    highlight: tango  # specifies the syntax highlighting style
   xaringan::moon_reader:
     css: ["default", "metropolisCustom.css", "metropolis-fontsCustom.css"]
     lib_dir: libs
@@ -17,6 +10,13 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+  html_document:
+    toc: true # table of content true
+    toc_float: yes
+    depth: 3  # upto three depths of headings (specified by #, ## and ###)
+    number_sections: false  ## if you want number sections at each table header
+    theme: united  # many options for theme, this one is my favorite.
+    highlight: tango  # specifies the syntax highlighting style
 ---
 
 
@@ -389,21 +389,25 @@ BiocManager::install("GEOquery")
 
 We can use the **getGEOSuppFiles** function to download any supplementary files to our local working directory.
 
-```{r download_Data1,cache=TRUE,warning=FALSE,message=FALSE,echo=TRUE,eval=FALSE}
+```{r download_Data1,cache=FALSE,warning=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
 require(GEOquery)
 
 GSM4332935_BigWig <- getGEOSuppFiles("GSM4332935",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
+
 GSM4332934_BigWig <- getGEOSuppFiles("GSM4332934",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
+
 GSM4332944_BigWig <- getGEOSuppFiles("GSM4332944",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
+
 GSM4332940_BigWig <- getGEOSuppFiles("GSM4332940",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
+
 GSM4332950_BigWig <- getGEOSuppFiles("GSM4332950",fetch_files = TRUE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
@@ -421,10 +425,10 @@ GSM4332934_BigWig <- getGEOSuppFiles("GSM4332934",fetch_files = FALSE,
 GSM4332944_BigWig <- getGEOSuppFiles("GSM4332944",fetch_files = FALSE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
-GSM4332940_BigWig <- getGEOSuppFiles("GSM4332940",fetch_files = TRUE,
+GSM4332940_BigWig <- getGEOSuppFiles("GSM4332940",fetch_files = FALSE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
-GSM4332950_BigWig <- getGEOSuppFiles("GSM4332950",fetch_files = TRUE,
+GSM4332950_BigWig <- getGEOSuppFiles("GSM4332950",fetch_files = FALSE,
                                      makeDirectory = FALSE,
                                      filter_regex = "*.bw")
 ```
@@ -696,7 +700,7 @@ We can subset our heatmap to only review the samples we want using indexing in R
 
 Our heatmaps have 3 dimension - Ranges/Rows, Bins/Columns, Samples. To subset samples then we can index our profileplyr object as in standard R.
 
-```{r zbtb_Sub,echo=TRUE,eval=FALSE,cache=FALSE,fig.width = 10,fig.height = 5}
+```{r zbtb_Sub,echo=TRUE,eval=TRUE,cache=FALSE,fig.width = 10,fig.height = 5}
 zbtb1_profile_subset <- zbtb1_profile_bl[,,3:4]
 generateEnrichedHeatmap(zbtb1_profile_subset)
 
